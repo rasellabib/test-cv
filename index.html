@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Upload Example</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="main" class="main">
+      <div id="page">
+        <div id="container">
+          <div id="ring"></div>
+          <div id="ring"></div>
+          <div id="ring"></div>
+          <div id="ring"></div>
+          <div id="h3">Uploading Ypu cv</div>
+        </div>
+      </div>
+      <div id="form-div" class="box">
+        <div class="input-box">
+          <h1 class="upload-area-ti">Upload a File</h1>
+          <form id="uploadfile">
+            <input
+              type="file"
+              id="fileInput"
+              name="file"
+              accept=".pdf"
+              hidden
+            />
+            <label class="up-lable" for="fileInput"
+              ><img src="./upload-cloud-fill.svg" alt=""
+            /></label>
+            <button type="submit" class="button">
+              Upload CV
+              <div class="icon">
+                <svg
+                  height="24"
+                  width="24"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M0 0h24v24H0z" fill="none"></path>
+                  <path
+                    d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+          </form>
+        </div>
+        <div id="fileshow" class="fileshow">
+          <!-- <div class="showfileBox">
+            <div class="left">
+              <h3>rasel.pdf</h3>
+            </div>
+            <div class="right">
+              <span>&#215;</span>
+            </div>
+          </div> -->
+        </div>
+
+        <p id="status"></p>
+      </div>
+      <div id="result" class="analyze-cv"></div>
+    </div>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"
+      integrity="sha512-LhccdVNGe2QMEfI3x4DVV3ckMRe36TfydKss6mJpdHjNFiV07dFpS2xzeZedptKZrwxfICJpez09iNioiSZ3hA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script>
+      window.addEventListener("load", () => {
+        const input = document.getElementById("uploadfile");
+        const fileshow = document.getElementById("fileshow");
+
+        input.addEventListener("change", (ev) => {
+          let fileName = ev.target.files[0].name;
+          let fieType = ev.target.value.split(".").pop();
+          console.log(fileName);
+          fileshowing(fileName, fieType);
+        });
+        const fileshowing = (fileName, fieType) => {
+          const showfileBoxElt = document.createElement("dir");
+          showfileBoxElt.classList.add("showfileBox");
+          const leftElt = document.createElement("div");
+          leftElt.classList.add("left");
+          const fileNameElt = document.createElement("h3");
+          fileNameElt.innerHTML = fileName;
+          leftElt.append(fileNameElt);
+          showfileBoxElt.append(leftElt);
+          const rightElt = document.createElement("div");
+          rightElt.classList.add("right");
+          showfileBoxElt.append(rightElt);
+          const cross = document.createElement("span");
+          cross.innerHTML = "&#215;";
+          rightElt.append(cross);
+          fileshow.append(showfileBoxElt);
+
+          cross.addEventListener("click", () => {
+            fileshow.removeChild(showfileBoxElt);
+          });
+        };
+      });
+    </script>
+    <script>
+      document
+        .getElementById("uploadfile")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the form from submitting the traditional way
+
+          const fileInput = document.getElementById("fileInput");
+          const resultElement = document.getElementById("result");
+          const file = fileInput.files[0];
+
+          if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            const loader = document.getElementById("page");
+            const form = document.getElementById("form-div");
+            const main = document.getElementById("main");
+            loader.style.display = "block";
+            loader.style.transition = "transform .5s";
+            form.style.display = "none";
+            main.style.backgroundColor = "rgb(120, 120, 107)";
+            fetch("https://jobkhuzi-apis-nxmemxk6rq-uc.a.run.app/analyze-cv", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                const resultElement = document.getElementById("result");
+                const converter = new showdown.Converter();
+                const markdownContent = data.results;
+                resultElement.style.display = "block";
+                loader.style.display = "none";
+                main.style.backgroundColor = "#ffffff";
+                const htmlContent = converter.makeHtml(markdownContent);
+                console.log(htmlContent);
+                resultElement.innerHTML = htmlContent;
+              })
+              .catch((error) => {
+                document.getElementById("status").innerText =
+                  "File upload failed.";
+                console.error("Error:", error);
+              });
+          } else {
+            document.getElementById("status").innerText =
+              "Please select a file to upload.";
+          }
+        });
+    </script>
+  </body>
+</html>

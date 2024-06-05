@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Change Table Data Example</title>
+  </head>
+  <body>
+    <table id="myTable" border="1">
+      <tr>
+        <th>Header 1</th>
+        <th>Header 2</th>
+      </tr>
+      <tr>
+        <td>Row 1, Cell 1</td>
+        <td>Row 1, Cell 2</td>
+      </tr>
+      <tr>
+        <td>Row 2, Cell 1</td>
+        <td>Row 2, Cell 2</td>
+      </tr>
+    </table>
+    <button onclick="changeCellData()">Change Cell Data</button>
+
+    <script>
+      function changeCellData() {
+        // টেবিলের রেফারেন্স পাওয়া
+        var table = document.getElementById("myTable");
+
+        // নির্দিষ্ট সেল নির্বাচন (2য় সারি, 2য় কলাম)
+        var cell = table.rows[2].cells[1];
+
+        // সেলের মান পরিবর্তন
+        cell.innerHTML = "Updated Cell 2";
+      }
+    </script>
+  </body>
+</html>
